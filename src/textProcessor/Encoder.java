@@ -2,8 +2,6 @@ package textProcessor;
 
 public class Encoder {
 	public static String byte2hex(byte[] b) {
-		// 一个字节的数，
-		// 转成16进制字符串
 		String hs = "";
 		String stmp = "";
 		for (int n = 0; n < b.length; n++) {
