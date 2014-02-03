@@ -1,6 +1,6 @@
 package textProcessor;
 
-public class enCoder {
+public class Encoder {
 	public static String byte2hex(byte[] b) {
 		// 一个字节的数，
 		// 转成16进制字符串
