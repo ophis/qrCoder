@@ -1,15 +1,18 @@
 package test;
 
 import qrCodeBase.QRCoder;
+import textProcessor.Encryptor;
 
 public class Test {
 	public static void main(String[] args){
 		QRCoder qrCoder = new QRCoder();
-		char [] c = {'a','b','c'};
-		String teString = new String(c);
-		String contentString = "abc";
+		String contentString = "ophis";
 		qrCoder.generateQR(contentString);
-		System.out.println(teString);
-		System.out.println(qrCoder.readQR("C:\\Users\\Frank\\Desktop\\unitag_qrcode_1391453126140.png"));
+		String cipherString = Encryptor.encrypt("Thisisaplaintext", "ophis");
+		//System.out.println(cipherString);
+		//System.out.println(cipherString.length());
+		String binaryString = Encryptor.byte2binary(contentString.getBytes());
+		byte[] conString = Encryptor.binary2byte(binaryString.getBytes());
+		System.out.println(new String(conString));
 	}
 }
