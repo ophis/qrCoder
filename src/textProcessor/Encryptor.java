@@ -9,37 +9,51 @@ import java.util.Hashtable;
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Encryptor {
 	private static String defaultKeyString = "LV";
 
-	public static String byte2binary(byte[] b){
-		String hs = "";
-		String stmp = "";
-		for(int n=0; n<b.length;n++){
-			stmp = (java.lang.Integer.toBinaryString(b[n]));
-			if (stmp.length() < 8){
-				while(stmp.length()<8)
-					stmp = "0" + stmp;
-				hs = hs + stmp;	
-			}
-			else
-				hs = hs + stmp;
-			System.out.println(stmp);
-		}
-		return hs;
-	}
-	
-	public static byte[] binary2byte(byte[] b) {
-		if ((b.length % 8) != 0)
-			throw new IllegalArgumentException("Not a valid length");
-		byte[] b2 = new byte[b.length / 8];
-		for (int n = 0; n < b.length; n += 8) {
-			String item = new String(b, n, 8);
-			b2[n / 8] = (byte) Integer.parseInt(item, 2);
-		}
-		return b2;
-	}
-	
+//	public static String byte2binary(byte[] b) {
+//		String hs = "";
+//		String stmp = "";
+//		for (int n = 0; n < b.length; n++) {
+//			stmp = (java.lang.Integer.toBinaryString(b[n]));
+//			if(n==0){
+//				hs += stmp;
+//			}
+//			else{
+//				hs+=(","+stmp);
+//			}
+//		}
+//		return hs;
+//	}
+//
+//	public static byte[] binary2byte(byte[] b) {
+//		
+//		/*
+//		if ((b.length % 8) != 0)
+//			throw new IllegalArgumentException("Not a valid length");
+//		byte[] b2 = new byte[b.length / 8];
+//		for (int n = 0; n < b.length; n += 8) {
+//			String item = new String(b, n, 8);
+//			b2[n / 8] = (byte) Integer.parseInt(item, 2);
+//		}*/
+//		ArrayList<Byte> b2 = new ArrayList<>();
+//		String contentString = new String(b);
+//		String[] byteStrings = contentString.split(",");
+//		for(int i=0; i<byteStrings.length;i++){
+//			byte byte2add = (byte)Integer.parseInt(byteStrings[i],2); 
+//			b2.add(byte2add);
+//		}
+//		byte[] ret = new byte[b2.size()];
+//		for(int i=0;i<b2.size();i++){
+//			ret[i] = b2.get(i);
+//		}
+//		return ret;
+//	}
+
 	public static String byte2hex(byte[] b) {
 		String hs = "";
 		String stmp = "";
@@ -75,7 +89,17 @@ public class Encryptor {
 		return secretKey;
 	}
 
-	public static String encrypt(String plaintextString, String key) {
+	public byte[] encryptWithBlank(String plaintextString, String key) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException{
+		return Encoder.encodeBlank(Encoder.byte2binary(encrypt(plaintextString.getBytes(), key)).getBytes());
+	}
+	
+	public String decryptWithBlank(String ciphertextString, String key) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, UnsupportedEncodingException{
+		byte[] binary = Encoder.decodeBlank(ciphertextString);
+		byte[] plain = decrypt(Encoder.binary2byte(binary),key);
+		return new String(plain);
+	}
+	
+	public String encrypt(String plaintextString, String key) {
 		String ciphertextString = "";
 		try {
 			return byte2hex(encrypt(plaintextString.getBytes(), key));
@@ -85,18 +109,18 @@ public class Encryptor {
 		return ciphertextString;
 	}
 
-	public static String decrypt(String ciphertextString, String key) {
+	public String decrypt(String ciphertextString, String key) {
 		String plaintextString = "";
 		try {
 			return new String(decrypt(hex2byte(ciphertextString.getBytes()),
 					key));
 		} catch (Exception e) {
-			e.printStackTrace();
+			plaintextString = "Decryption error!";
 		}
 		return plaintextString;
 	}
 
-	public static byte[] encrypt(byte[] plaintext, String key)
+	public byte[] encrypt(byte[] plaintext, String key)
 			throws NoSuchAlgorithmException, NoSuchProviderException,
 			NoSuchPaddingException, InvalidKeyException,
 			IllegalBlockSizeException, BadPaddingException,
@@ -111,7 +135,7 @@ public class Encryptor {
 		return ciphertext;
 	}
 
-	public static byte[] decrypt(byte[] ciphertext, String key)
+	public byte[] decrypt(byte[] ciphertext, String key)
 			throws NoSuchAlgorithmException, NoSuchPaddingException,
 			InvalidKeyException, IllegalBlockSizeException {
 		SecretKey secretKey = generateKey(key);// new
@@ -131,26 +155,27 @@ public class Encryptor {
 		return plaintext;
 	}
 
-	public static String formString(String publicString, String privateString,
+	public String formString(String publicString, String privateString,
 			String key) throws NoSuchAlgorithmException,
 			NoSuchProviderException, InvalidKeyException,
-			NoSuchPaddingException, IllegalBlockSizeException {
+			NoSuchPaddingException, IllegalBlockSizeException, JSONException {
 		if (publicString.length() > 140)
 			publicString = "";
 		if (privateString.length() > 140)
 			privateString = "";
 		String cipherPrivateString = encrypt(privateString, key).toString();
-		String result = publicString + "/" + cipherPrivateString;
+//		String result = publicString + "/" + cipherPrivateString;
+		String result = Encoder.encodeJSON(publicString, cipherPrivateString);
 		result = encrypt(result, defaultKeyString);
 		return result;
 	}
 
-	public static Hashtable<Integer, String> analyse(String formedString,
-			String key) {
+	public Hashtable<Integer, String> analyse(String formedString,
+			String key) throws JSONException {
 		formedString = decrypt(formedString, defaultKeyString);
-		String[] stringarray = formedString.split("/");
-		String publicString = stringarray[0];
-		String privateString = stringarray[1];
+		JSONObject jObj = Encoder.decodJSON(formedString);
+		String publicString = jObj.getString("public");
+		String privateString = jObj.getString("private");
 		if (key == "") {
 			privateString = "";
 		} else {

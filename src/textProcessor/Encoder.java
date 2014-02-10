@@ -1,6 +1,43 @@
 package textProcessor;
 
+import java.util.ArrayList;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Encoder {
+	public static byte[] encodeBlank(byte[] binary){
+		byte[] encoded = new byte[binary.length];
+		for(int i=0;i<binary.length;i++){
+			if(binary[i]=='0'){
+				encoded[i]='\n';
+			}
+			else if (binary[i]=='1') {
+				encoded[i]='\n';
+			}
+			else {
+				throw new IllegalArgumentException("Contains none binary characters");
+			}
+		}
+		return encoded;
+	}
+	
+	public static byte[] decodeBlank(String encodedContent){
+		StringBuilder sb = new StringBuilder();
+		for(int i=0;i<encodedContent.length();i++){
+			if(encodedContent.charAt(i)=='\n'){
+				sb.append('0');
+			}
+			else if (encodedContent.charAt(i)=='\b') {
+				sb.append('1');
+			}
+			else {
+				throw new IllegalArgumentException("Contains invalid characters");
+			}
+		}
+		return sb.toString().getBytes();
+	}
+	
 	public static String byte2binary(byte[] b){
 		String hs = "";
 		String stmp = "";
@@ -51,5 +88,35 @@ public class Encoder {
 			b2[n / 2] = (byte) Integer.parseInt(item, 16);
 		}
 		return b2;
+	}
+	
+	public static String toBlankString(String hexString){
+		StringBuilder sBuilder = new StringBuilder();
+		for(int i=0;i<hexString.length();i++){
+			int hexValue = Integer.parseInt(String.valueOf(hexString.charAt(i)),16)+1;
+			sBuilder.append(Character.toChars(hexValue));
+			//System.out.println(hexValue);
+		}
+		return sBuilder.toString();
+	}
+	
+	public static String toHexString(String blankString){
+		StringBuilder sBuilder = new StringBuilder();
+		for(int i=0;i<blankString.length();i++){
+			int a = blankString.charAt(i)-1;
+			sBuilder.append(Integer.toHexString(a));
+			//System.out.println(hexValue);
+		}
+		return sBuilder.toString();
+	}
+	
+	public static String encodeJSON(String publicString, String privateString) throws JSONException{
+		String JString = "{\"public\":\""+publicString+"\",\"private\":\""+privateString+"\"}";
+		return JString;
+	}
+	
+	public static JSONObject decodJSON(String JString) throws JSONException{
+		JSONObject jObject = new JSONObject(JString);
+		return jObject;
 	}
 }
