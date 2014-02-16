@@ -125,8 +125,8 @@ public class Encryptor {
 		if (privateString.length() > 140)
 			privateString = "";
 		String cipherPrivateString = encrypt(privateString, key).toString();
-		String result = publicString + "/" + cipherPrivateString;
-//		String result = Encoder.encodeJSON(publicString, cipherPrivateString);
+		//String result = publicString + "/" + cipherPrivateString;
+		String result = Encoder.encodeJSON(publicString, cipherPrivateString);
 		result = encrypt(result, defaultKeyString);
 		return result;
 	}

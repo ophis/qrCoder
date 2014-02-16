@@ -29,7 +29,7 @@ public class Test {
 		System.out.println(Encryptor.decrypt(secret, "ophis"));
 		String result = Encryptor.formString("baidu", "google", "ophis");
 		System.out.println(result);
-		//Hashtable<Integer, String> ret = Encryptor.analyse(result, "ophis");
-		//System.out.println("Public:"+ret.get(0)+"Private:"+ret.get(1));
+		Hashtable<Integer, String> ret = Encryptor.analyse(result, "ophis");
+		System.out.println("Public:"+ret.get(0)+"Private:"+ret.get(1));
 	}
 }
