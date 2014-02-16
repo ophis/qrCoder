@@ -1,7 +1,5 @@
 package textProcessor;
 
-import java.util.ArrayList;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -90,6 +88,7 @@ public class Encoder {
 		return b2;
 	}
 	
+	//convert text to blank encoded string
 	public static String toBlankString(String hexString){
 		StringBuilder sBuilder = new StringBuilder();
 		for(int i=0;i<hexString.length();i++){
@@ -100,6 +99,7 @@ public class Encoder {
 		return sBuilder.toString();
 	}
 	
+	//convert blank encoded string to visible text
 	public static String toHexString(String blankString){
 		StringBuilder sBuilder = new StringBuilder();
 		for(int i=0;i<blankString.length();i++){
@@ -111,7 +111,7 @@ public class Encoder {
 	}
 	
 	public static String encodeJSON(String publicString, String privateString) throws JSONException{
-		String JString = "{\"public\":\""+publicString+"\",\"private\":\""+privateString+"\"}";
+		String JString = "{\"PU\":\""+publicString+"\",\"PR\":\""+privateString+"\"}";
 		return JString;
 	}
 	
